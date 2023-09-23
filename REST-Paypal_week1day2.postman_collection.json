@@ -1,0 +1,181 @@
+{
+	"info": {
+		"_postman_id": "24a5ba3a-56f9-4f21-a782-685dca8b239e",
+		"name": "REST-Paypal_week1day2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29623372",
+		"_collection_link": "https://lively-shuttle-329622.postman.co/workspace/Postman-September~e2713427-9e0d-4290-a863-bb1450d559ef/collection/29623372-24a5ba3a-56f9-4f21-a782-685dca8b239e?action=share&source=collection_link&creator=29623372"
+	},
+	"item": [
+		{
+			"name": "RetrieveToken",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"Resp = pm.response.json();\r",
+							"pm.globals.set(\"Acctoken\",Resp.access_token);\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "EMnAWe06ioGtouJs7gLYT9chK9-2jJ--7MKRXpI8FesmY_2Kp-d_7aCqff7M9moEJBvuXoBO4clKtY0v",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "AUv8rrc_P-EbP2E0mpb49BV7rFt3Usr-vdUZO8VGOnjRehGHBXkSzchr37SYF2GNdQFYSp72jh5QUhzG",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://{{URL}}/v1/oauth2/token",
+					"protocol": "https",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"v1",
+						"oauth2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateOrder",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"Resp = pm.response.json();\r",
+							"pm.globals.set(\"orderid\",Resp.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{Acctoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"intent\": \"CAPTURE\",\r\n    \"purchase_units\": [\r\n        {\r\n            \"items\": [\r\n                {\r\n                    \"name\": \"T-Shirt\",\r\n                    \"description\": \"Green XL\",\r\n                    \"quantity\": \"1\",\r\n                    \"unit_amount\": {\r\n                        \"currency_code\": \"USD\",\r\n                        \"value\": \"100.00\"\r\n                    }\r\n                }\r\n            ],\r\n            \"amount\": {\r\n                \"currency_code\": \"USD\",\r\n                \"value\": \"100.00\",\r\n                \"breakdown\": {\r\n                    \"item_total\": {\r\n                        \"currency_code\": \"USD\",\r\n                        \"value\": \"100.00\"\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    ],\r\n    \"application_context\": {\r\n        \"return_url\": \"https://example.com/return\",\r\n        \"cancel_url\": \"https://example.com/cancel\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api-m.sandbox.paypal.com/v2/checkout/orders",
+					"protocol": "https",
+					"host": [
+						"api-m",
+						"sandbox",
+						"paypal",
+						"com"
+					],
+					"path": [
+						"v2",
+						"checkout",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ShowOrder",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"}); "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{Acctoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-m.sandbox.paypal.com/v2/checkout/orders/:order_id",
+					"protocol": "https",
+					"host": [
+						"api-m",
+						"sandbox",
+						"paypal",
+						"com"
+					],
+					"path": [
+						"v2",
+						"checkout",
+						"orders",
+						":order_id"
+					],
+					"variable": [
+						{
+							"key": "order_id",
+							"value": "{{orderid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
